@@ -1,0 +1,13 @@
+// com/dbs/talentlink/dto/EmailSummaryResponse.java
+package com.dbs.talentlink.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmailSummaryResponse {
+    private String emailContent;
+}

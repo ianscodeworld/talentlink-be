@@ -18,10 +18,12 @@ public class CandidateDetailResponse {
     private int currentInterviewRound;
     private CandidateStatus status;
     private Long demandId;
-    private Long vendorId;
     private String vendorName;
     private Instant createdAt;
-    private List<FeedbackResponse> feedbacks; // 包含反馈列表
+    private List<FeedbackResponse> feedbacks;
+
+    // --- 新增字段 ---
+    private Integer totalRoundsOverride;
 
     public static CandidateDetailResponse fromEntity(Candidate candidate) {
         return CandidateDetailResponse.builder()
@@ -31,12 +33,13 @@ public class CandidateDetailResponse {
                 .currentInterviewRound(candidate.getCurrentInterviewRound())
                 .status(candidate.getStatus())
                 .demandId(candidate.getDemand().getId())
-                .vendorId(candidate.getVendor().getId())
-                .vendorName(candidate.getVendor().getCompanyName())
+                .vendorName(candidate.getVendorName())
                 .createdAt(candidate.getCreatedAt())
                 .feedbacks(candidate.getFeedbacks().stream()
                         .map(FeedbackResponse::fromEntity)
                         .collect(Collectors.toList()))
+                // --- 填充新增字段 ---
+                .totalRoundsOverride(candidate.getTotalRoundsOverride())
                 .build();
     }
 }

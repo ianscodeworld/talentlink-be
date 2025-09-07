@@ -2,16 +2,14 @@ package com.dbs.talentlink.entity;
 
 import com.dbs.talentlink.model.CandidateStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -41,11 +39,16 @@ public class Candidate {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "demand_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Demand demand;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id", nullable = false)
-    private Vendor vendor;
+    // --- 新增字段 ---
+    @Column(name = "vendor_name")
+    private String vendorName;
+
+    @Column(name = "total_rounds_override")
+    private Integer totalRoundsOverride;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -61,7 +64,7 @@ public class Candidate {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    private List<Feedback> feedbacks = new ArrayList<>();
+    private Set<Feedback> feedbacks;
 
     private String gender;
 

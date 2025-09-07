@@ -27,6 +27,15 @@ public class CandidateController {
     private final InterviewService interviewService;
     private final CandidateHistoryService historyService;
 
+    @PutMapping("/{candidateId}/rounds")
+    @PreAuthorize("hasRole('HM')")
+    public ResponseEntity<CandidateResponse> updateOverrideRounds(
+            @PathVariable Long candidateId,
+            @Valid @RequestBody UpdateRoundsRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        CandidateResponse updatedCandidate = candidateService.updateOverrideRounds(candidateId, request, currentUser);
+        return ResponseEntity.ok(updatedCandidate);
+    }
 
     @PostMapping("/{candidateId}/feedback")
     @PreAuthorize("hasRole('INTERVIEWER')")
@@ -75,5 +84,22 @@ public class CandidateController {
             @AuthenticationPrincipal User currentUser) {
         String emailContent = candidateService.generateVendorEmailSummary(candidateId, currentUser);
         return ResponseEntity.ok(new EmailSummaryResponse(emailContent));
+    }
+
+    @PostMapping("/check-duplicate")
+    @PreAuthorize("hasRole('HM')")
+    public ResponseEntity<DuplicateCheckResponse> checkDuplicate(@Valid @RequestBody CheckDuplicateRequest request) {
+        DuplicateCheckResponse response = candidateService.checkDuplicate(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{candidateId}")
+    @PreAuthorize("hasRole('HM')")
+    public ResponseEntity<CandidateResponse> updateCandidate(
+            @PathVariable Long candidateId,
+            @RequestBody UpdateCandidateRequest request, // 无需 @Valid 因为我们允许部分更新
+            @AuthenticationPrincipal User currentUser) {
+        CandidateResponse updatedCandidate = candidateService.updateCandidate(candidateId, request, currentUser);
+        return ResponseEntity.ok(updatedCandidate);
     }
 }

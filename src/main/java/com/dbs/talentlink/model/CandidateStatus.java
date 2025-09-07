@@ -6,6 +6,7 @@ public enum CandidateStatus {
     PASSED_WAITING_FOR_INTERVIEW,
     REJECTED,
     HIRED,
-    FINALIST, // 新增
-    ON_HOLD   // 新增
+    FINALIST,
+    ON_HOLD,
+    WITHDRAWN // <-- 新增
 }

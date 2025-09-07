@@ -87,4 +87,9 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    // --- 新增字段 ---
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default // <-- 添加这个注解
+    private boolean isActive = true;
 }

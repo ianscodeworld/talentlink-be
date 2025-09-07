@@ -15,16 +15,21 @@ import java.util.Set;
 
 @Repository
 public interface DemandRepository extends JpaRepository<Demand, Long> {
-    // 将返回类型从 List<Demand> 改为 Page<Demand>
-    // 添加 Pageable 参数
-    Page<Demand> findByCreatedById(Long userId, Pageable pageable);
-    Page<Demand> findByStatus(DemandStatus status, Pageable pageable);
-    @Query("SELECT DISTINCT d FROM Demand d JOIN d.specialties s WHERE s IN :userSpecialties OR 'FULLSTACK' IN (SELECT sp.name FROM Specialty sp WHERE sp IN :userSpecialties)")
-    Page<Demand> findRelevantDemands(@Param("userSpecialties") Set<Specialty> userSpecialties, Pageable pageable);
 
-    @Query("SELECT DISTINCT d FROM Demand d JOIN d.specialties s WHERE d.status = :status AND s IN :specialties")
+    // @Where 会自动处理 is_deleted=false, 无需改动
+    Page<Demand> findByCreatedById(Long userId, Pageable pageable);
+
+    // @Where 也会自动处理
+    Page<Demand> findByStatus(DemandStatus status, Pageable pageable);
+
+    // 对于自定义的 @Query, 我们需要手动加入 is_deleted=false 条件
+    @Query("SELECT DISTINCT d FROM Demand d JOIN d.specialties s WHERE d.isDeleted = false AND d.status = :status AND s IN :specialties")
     Page<Demand> findByStatusAndSpecialtiesIn(
             @Param("status") DemandStatus status,
             @Param("specialties") Set<Specialty> specialties,
             Pageable pageable);
+
+    // @Where 也会自动处理
+    List<Demand> findByCreatedByIdAndStatusAndCandidatesIsEmpty(Long createdById, DemandStatus status);
+
 }

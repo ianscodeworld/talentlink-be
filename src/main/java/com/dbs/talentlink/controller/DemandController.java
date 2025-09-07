@@ -24,6 +24,16 @@ public class DemandController {
     private final DemandService demandService;
     private final CandidateService candidateService;
 
+    @PutMapping("/{demandId}")
+    @PreAuthorize("hasRole('HM')")
+    public ResponseEntity<DemandResponse> updateDemand(
+            @PathVariable Long demandId,
+            @Valid @RequestBody UpdateDemandRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        DemandResponse updatedDemand = demandService.updateDemand(demandId, request, currentUser);
+        return ResponseEntity.ok(updatedDemand);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('HM')")
     public ResponseEntity<DemandResponse> createDemand(
@@ -78,5 +88,12 @@ public class DemandController {
         return ResponseEntity.ok(demands);
     }
 
-
+    @DeleteMapping("/{demandId}")
+    @PreAuthorize("hasRole('HM')")
+    public ResponseEntity<Void> deleteDemand(
+            @PathVariable Long demandId,
+            @AuthenticationPrincipal User currentUser) {
+        demandService.deleteDemand(demandId, currentUser);
+        return ResponseEntity.noContent().build();
+    }
 }

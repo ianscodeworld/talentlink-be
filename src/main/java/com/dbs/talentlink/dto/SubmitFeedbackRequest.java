@@ -12,4 +12,7 @@ public class SubmitFeedbackRequest {
 
     @NotNull(message = "Recommendation cannot be null")
     private Recommendation recommendation;
+
+    // --- 新增可选字段 ---
+    private String interviewerNameOverride;
 }

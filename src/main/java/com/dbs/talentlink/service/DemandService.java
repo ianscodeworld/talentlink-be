@@ -6,11 +6,13 @@ import com.dbs.talentlink.dto.DemandResponse;
 import com.dbs.talentlink.dto.UpdateDemandStatusRequest;
 import com.dbs.talentlink.entity.Demand;
 import com.dbs.talentlink.entity.Specialty;
+import com.dbs.talentlink.entity.Squad;
 import com.dbs.talentlink.entity.User;
 import com.dbs.talentlink.model.DemandStatus;
 import com.dbs.talentlink.model.Role;
 import com.dbs.talentlink.repository.DemandRepository;
 import com.dbs.talentlink.repository.SpecialtyRepository;
+import com.dbs.talentlink.repository.SquadRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.AccessDeniedException;
+import com.dbs.talentlink.dto.UpdateDemandRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +33,40 @@ public class DemandService {
 
     private final DemandRepository demandRepository;
     private final SpecialtyRepository specialtyRepository;
+    private final SquadRepository squadRepository;
 
+    @Transactional
+    public DemandResponse updateDemand(Long demandId, UpdateDemandRequest request, User currentUser) {
+        Demand demand = demandRepository.findById(demandId)
+                .orElseThrow(() -> new EntityNotFoundException("Demand not found with id: " + demandId));
+
+        if (!demand.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("User does not have permission to edit this demand");
+        }
+
+        // 逐字段更新，仅当请求中提供了该字段时才更新
+        if (request.getDescription() != null) {
+            demand.setDescription(request.getDescription());
+        }
+        if (request.getTotalInterviewRounds() != null) {
+            demand.setTotalInterviewRounds(request.getTotalInterviewRounds());
+        }
+        if (request.getRequiredPositions() != null) {
+            demand.setRequiredPositions(request.getRequiredPositions());
+        }
+        if (request.getSquadId() != null) {
+            Squad squad = squadRepository.findById(request.getSquadId())
+                    .orElseThrow(() -> new EntityNotFoundException("Squad not found"));
+            demand.setSquad(squad);
+        }
+        if (request.getSpecialties() != null) {
+            Set<Specialty> specialties = specialtyRepository.findByNameIn(request.getSpecialties());
+            demand.setSpecialties(specialties);
+        }
+
+        Demand updatedDemand = demandRepository.save(demand);
+        return DemandResponse.fromEntity(updatedDemand);
+    }
 
     @Transactional
     public DemandResponse createDemand(CreateDemandRequest request, User currentUser) {
@@ -38,6 +74,8 @@ public class DemandService {
         if (request.getSpecialties() != null && !request.getSpecialties().isEmpty()) {
             specialties = specialtyRepository.findByNameIn(request.getSpecialties());
         }
+        Squad squad = new Squad();
+        squad.setId(request.getSquadId());
 
         Demand demand = Demand.builder()
                 .jobTitle(request.getJobTitle())
@@ -45,11 +83,25 @@ public class DemandService {
                 .totalInterviewRounds(request.getTotalInterviewRounds())
                 .status(DemandStatus.OPEN)
                 .createdBy(currentUser)
+                .squad(squad)
                 .specialties(specialties) // 设置专业技能
                 .build();
 
         Demand savedDemand = demandRepository.save(demand);
         return DemandResponse.fromEntity(savedDemand);
+    }
+
+    @Transactional
+    public void deleteDemand(Long demandId, User currentUser) {
+        Demand demand = demandRepository.findById(demandId)
+                .orElseThrow(() -> new EntityNotFoundException("Demand not found with id: " + demandId));
+
+        if (!demand.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("User does not have permission to delete this demand");
+        }
+
+        // 由于 @SQLDelete, 这个调用会自动变为 UPDATE is_deleted = true
+        demandRepository.delete(demand);
     }
 
     @Transactional(readOnly = true)

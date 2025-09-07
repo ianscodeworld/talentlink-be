@@ -1,10 +1,7 @@
 package com.dbs.talentlink.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -23,10 +20,14 @@ public class InterviewAssignment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "candidate_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Candidate candidate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interviewer_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User interviewer;
 
     @Column(name = "interview_round", nullable = false)

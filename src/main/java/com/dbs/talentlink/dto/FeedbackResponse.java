@@ -18,6 +18,13 @@ public class FeedbackResponse {
     private String interviewerName;
     private Instant createdAt;
 
+    // --- 新增的上下文信息字段 ---
+    private Long demandId;
+    private String jobTitle;
+    private Long candidateId;
+    private String candidateName;
+
+
     public static FeedbackResponse fromEntity(Feedback feedback) {
         return FeedbackResponse.builder()
                 .id(feedback.getId())
@@ -27,6 +34,11 @@ public class FeedbackResponse {
                 .interviewerId(feedback.getInterviewer().getId())
                 .interviewerName(feedback.getInterviewer().getName())
                 .createdAt(feedback.getCreatedAt())
+                // --- 关联查询并填充新增字段 ---
+                .demandId(feedback.getCandidate().getDemand().getId())
+                .jobTitle(feedback.getCandidate().getDemand().getJobTitle())
+                .candidateId(feedback.getCandidate().getId())
+                .candidateName(feedback.getCandidate().getName())
                 .build();
     }
 }

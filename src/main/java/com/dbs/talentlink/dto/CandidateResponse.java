@@ -16,9 +16,11 @@ public class CandidateResponse {
     private int currentInterviewRound;
     private CandidateStatus status;
     private Long demandId;
-    private Long vendorId;
     private String vendorName;
     private Instant createdAt;
+
+    // --- 新增字段 ---
+    private Integer totalRoundsOverride;
 
     public static CandidateResponse fromEntity(Candidate candidate) {
         return CandidateResponse.builder()
@@ -28,9 +30,10 @@ public class CandidateResponse {
                 .currentInterviewRound(candidate.getCurrentInterviewRound())
                 .status(candidate.getStatus())
                 .demandId(candidate.getDemand().getId())
-                .vendorId(candidate.getVendor().getId())
-                .vendorName(candidate.getVendor().getCompanyName())
+                .vendorName(candidate.getVendorName())
                 .createdAt(candidate.getCreatedAt())
+                // --- 填充新增字段 ---
+                .totalRoundsOverride(candidate.getTotalRoundsOverride())
                 .build();
     }
 }

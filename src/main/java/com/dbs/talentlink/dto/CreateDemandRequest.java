@@ -16,4 +16,6 @@ public class CreateDemandRequest {
     private int totalInterviewRounds;
 
     private List<String> specialties;
+
+    private Long squadId;
 }

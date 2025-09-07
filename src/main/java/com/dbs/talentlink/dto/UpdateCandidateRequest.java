@@ -1,20 +1,17 @@
 package com.dbs.talentlink.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AddCandidateRequest {
-    @NotBlank(message = "Candidate name cannot be blank")
+public class UpdateCandidateRequest {
+    // 允许修改候选人姓名和供应商
     private String name;
+    private String vendorName;
 
+    // 允许修改所有详细信息
     private String resumeSummary;
-
-    // --- 新增字段 ---
     private String gender;
     private String skillset;
-    private String vendorName;
     private String seniority;
     private String relatedWorkingExperience;
     private String onboardingTime;
